@@ -13,7 +13,6 @@ public class BaseTests {
 
     @BeforeMethod
     public void setUp() {
-
     }
 
     @AfterMethod

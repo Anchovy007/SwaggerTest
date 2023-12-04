@@ -1,26 +1,44 @@
 package user.get.login;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.json.JsonMapper;
-import data_providers.DataProvider;
 import io.restassured.response.Response;
 import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
-import petstore.models.Pet;
 import petstore.swagger.requests.Requests;
+import user.UserBaseTests;
 
-import java.util.List;
+import static org.apache.http.HttpStatus.*;
+import static petstore.swagger.instances.endpoints.UserEndpoint.*;
 
-import static petstore.swagger.instances.endpoints.PetEndpoints.PETS_BY_STATUS;
+public class NegativeGetStatusTest extends UserBaseTests {
 
-public class NegativeGetStatusTest {
+    @BeforeClass
+    public void beforeCreateUserTests() {
+        Requests.post(USER, user);
+    }
 
-    @Test(dataProvider = "Incorrect_statuses", dataProviderClass = DataProvider.class)
-    public void getPetByStatusCorrectStatuses(String[] status) throws JsonProcessingException {
-        Response response = Requests.get(PETS_BY_STATUS+status[0]);
-        JsonMapper mapper = new JsonMapper();
-        List<Pet> myObjects = mapper.readValue(response.asString(), new TypeReference<>(){});
-        Assert.assertEquals(myObjects.size(), 0, "Pet statuses list is not empty");
+    @Test
+    public void getUserLoginIncorrectPassword() {
+        Response response = Requests.getUserLogin(USER_LOGIN, user.getUsername(), "AAA");
+        Assert.assertEquals(response.getStatusCode(), SC_BAD_REQUEST, "The user has gained access");
+    }
+
+    @Test
+    public void getUserLoginIncorrectUsername() {
+        Response response = Requests.getUserLogin(USER_LOGIN, "AAA", user.getPassword());
+        Assert.assertEquals(response.getStatusCode(), SC_BAD_REQUEST, "The user has gained access");
+    }
+
+    @Test
+    public void getUserLoginIncorrectUsernameAndPassword() {
+        Response response = Requests.getUserLogin(USER_LOGIN,"AAA", "AAA");
+        Assert.assertEquals(response.getStatusCode(), SC_BAD_REQUEST, "The user has gained access");
+    }
+
+    @Test
+    public void getUserNotExist() {
+        Requests.delete( USER_STRICT + user.getUsername());
+        Response response = Requests.getUserLogin(USER_LOGIN, user.getUsername(), user.getPassword());
+        Assert.assertEquals(response.getStatusCode(), SC_NOT_FOUND, "Delete not existing user has done successfully");
     }
 }

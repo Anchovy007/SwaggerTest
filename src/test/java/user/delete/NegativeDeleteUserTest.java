@@ -1,41 +1,34 @@
 package user.delete;
 
-import data_providers.DataProvider;
 import io.restassured.response.Response;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import petstore.swagger.requests.Requests;
-import user.BaseTests;
+import user.UserBaseTests;
 
 import static org.apache.http.HttpStatus.SC_METHOD_NOT_ALLOWED;
 import static org.apache.http.HttpStatus.SC_NOT_FOUND;
-import static petstore.swagger.instances.endpoints.PetEndpoints.PET;
-import static petstore.swagger.instances.endpoints.PetEndpoints.PET_STRICT;
+import static petstore.swagger.instances.endpoints.UserEndpoint.USER;
+import static petstore.swagger.instances.endpoints.UserEndpoint.USER_STRICT;
 
-public class NegativeDeleteUserTest extends BaseTests {
+public class NegativeDeleteUserTest extends UserBaseTests {
 
     @BeforeClass
     public void beforeDeleteNegativeTests() {
-        Requests.post(PET, pet);
-        Requests.delete( PET_STRICT + pet.getId());
-    }
-
-    @Test(dataProvider = "Incorrect_id", dataProviderClass = DataProvider.class)
-    public static void deletePetByIncorrectIdNegative(String id) {
-        Response response = Requests.delete(PET_STRICT + id);
-        Assert.assertEquals(response.getStatusCode(), SC_NOT_FOUND, "Incompatible type of id works out");
+        Requests.post(USER, user);
+        Requests.delete( USER_STRICT + user.getUsername());
     }
 
     @Test
-    public static void deleteNotExistingPetByIdNegativeTest() {
-        Response response = Requests.delete( PET_STRICT + pet.getId());
-        Assert.assertEquals(response.getStatusCode(), SC_NOT_FOUND, "Delete not existing pet has done successfully");
+    public static void deleteNotExistingUserByIdNegativeTest() {
+        Response response = Requests.delete( USER_STRICT + user.getUsername());
+        Assert.assertEquals(response.getStatusCode(), SC_NOT_FOUND, "Delete not existing user has done successfully");
     }
 
     @Test
     public static void sendDeleteRequestWithEmptyQueryTest() {
-        Response response = Requests.delete(PET_STRICT);
+        Response response = Requests.delete(USER_STRICT);
         Assert.assertEquals(response.getStatusCode(), SC_METHOD_NOT_ALLOWED, "Empty query doesn't invoke an error");
     }
 }

@@ -1,6 +1,7 @@
 package petstore.swagger.requests;
 
 
+import io.qameta.allure.Step;
 import io.restassured.RestAssured;
 import io.restassured.response.Response;
 
@@ -20,11 +21,33 @@ public class Requests {
                 .extract().response();
     }
 
-    public static Response post(String url, Object pet) {
+    public static Response getUserLogin(String url, String username, String password) {
         return RestAssured.given()
                 .baseUri(BASE_URL)
                 .header("Content-type", "application/json")
-                .body(pet)
+                .queryParam("username", username)
+                .queryParam("password", password)
+                .get(url)
+                .then()
+                .log().all()
+                .extract().response();
+    }
+
+    public static Response getUserLogout(String url) {
+        return RestAssured.given()
+                .baseUri(BASE_URL)
+                .header("Content-type", "application/json")
+                .get(url)
+                .then()
+                .log().all()
+                .extract().response();
+    }
+
+    public static Response post(String url, Object model) {
+        return RestAssured.given()
+                .baseUri(BASE_URL)
+                .header("Content-type", "application/json")
+                .body(model)
                 .when()
                 .post(url)
                 .then()
@@ -44,11 +67,23 @@ public class Requests {
                 .extract().response();
     }
 
-    public static Response put(String url, Object pet) {
+    public static Response post(String url, Object... model) {
         return RestAssured.given()
                 .baseUri(BASE_URL)
                 .header("Content-type", "application/json")
-                .body(pet)
+                .body(model)
+                .when()
+                .post(url)
+                .then()
+                .log().all()
+                .extract().response();
+    }
+
+    public static Response put(String url, Object model) {
+        return RestAssured.given()
+                .baseUri(BASE_URL)
+                .header("Content-type", "application/json")
+                .body(model)
                 .when()
                 .put(url)
                 .then()

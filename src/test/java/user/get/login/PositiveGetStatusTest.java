@@ -1,37 +1,26 @@
 package user.get.login;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.json.JsonMapper;
-import data_providers.DataProvider;
 import io.restassured.response.Response;
 import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
-import petstore.models.Pet;
 import petstore.swagger.requests.Requests;
-import petstore.validator.JsonValidator;
-
-import java.util.List;
+import user.UserBaseTests;
 
 import static org.apache.http.HttpStatus.SC_OK;
-import static petstore.swagger.instances.endpoints.PetEndpoints.PETS_BY_STATUS;
+import static petstore.swagger.instances.endpoints.UserEndpoint.USER;
+import static petstore.swagger.instances.endpoints.UserEndpoint.USER_LOGIN;
 
-public class PositiveGetStatusTest {
+public class PositiveGetStatusTest extends UserBaseTests {
 
-    @Test(dataProvider = "Correct_statuses", dataProviderClass = DataProvider.class)
-    public void getPetByStatusCorrectStatuses(String[] status) {
-        Response response = Requests.get(PETS_BY_STATUS+status[0]);
-        Assert.assertEquals(response.getStatusCode(), SC_OK);
-        JsonValidator.validateList(response.toString());
+    @BeforeClass
+    public void beforeCreateUserTests() {
+        Requests.post(USER, user);
     }
 
-    @Test(dataProvider = "Correct_statuses", dataProviderClass = DataProvider.class)
-    public void responseBodyHasStatusAccordingRequest(String[] status) throws JsonProcessingException {
-        Response response = Requests.get(PETS_BY_STATUS+status[0]);
-        JsonMapper mapper = new JsonMapper();
-        List<Pet> myObjects = mapper.readValue(response.asString(), new TypeReference<>(){});
-        for (Pet pet : myObjects) {
-            Assert.assertEquals(pet.getStatus(), status[0], "One of objects has incorrect parameters");
-        }
+    @Test
+    public void getUserLogin() {
+        Response response = Requests.getUserLogin(USER_LOGIN, user.getUsername(), user.getPassword());
+        Assert.assertEquals(response.getStatusCode(), SC_OK, "Invalid password, username, or user does not exist");
     }
 }

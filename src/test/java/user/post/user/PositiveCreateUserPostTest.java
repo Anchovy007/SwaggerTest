@@ -1,8 +1,7 @@
-package user.put;
+package user.post.user;
 
 import io.restassured.response.Response;
 import org.testng.Assert;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import petstore.common.create.UserCreate;
 import petstore.models.User;
@@ -14,18 +13,20 @@ import static org.apache.http.HttpStatus.SC_OK;
 import static petstore.swagger.instances.endpoints.UserEndpoint.USER;
 import static petstore.validator.ValidationTemplatePaths.PATH_TO_USER_TEMPLATE;
 
-public class PositivePutTest extends UserBaseTests {
+public class PositiveCreateUserPostTest extends UserBaseTests {
 
-    @BeforeClass
-    public void beforeGetByIdTests() {
-        Requests.post(USER, user);
+    @Test
+    public static void postCreateUserPositive() {
+        Response response = Requests.post(USER, user);
+        Assert.assertEquals(response.getStatusCode(), SC_OK, "Pet creation failed");
+        JsonValidator.validateObject(response, PATH_TO_USER_TEMPLATE);
     }
 
     @Test
-    public void putUserWithFieldsPositive() {
+    public static void postCreateUserFieldsPositive() {
         User user = UserCreate.minUserCreate();
-        Response response = Requests.put(USER, user);
-        Assert.assertEquals(response.getStatusCode(), SC_OK, "User creation failed");
+        Response response = Requests.post(USER, user);
+        Assert.assertEquals(response.getStatusCode(), SC_OK, "Pet creation failed");
         JsonValidator.validateObject(response, PATH_TO_USER_TEMPLATE);
     }
 }

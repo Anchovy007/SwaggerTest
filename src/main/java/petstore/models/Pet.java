@@ -65,7 +65,7 @@ public class Pet {
                 Objects.equals(name, pet.name) &&
                 Objects.equals(photoUrls, pet.photoUrls) &&
                 Objects.equals(tags, pet.tags) &&
-                status == pet.status;
+                status.equals(pet.status);
     }
 
     @Override

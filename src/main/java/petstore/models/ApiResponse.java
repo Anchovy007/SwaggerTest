@@ -1,7 +1,10 @@
 package petstore.models;
 
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+
 import java.util.Objects;
 
+@JsonPropertyOrder({"code", "type", "message"})
 public class ApiResponse {
 
     private Integer code;

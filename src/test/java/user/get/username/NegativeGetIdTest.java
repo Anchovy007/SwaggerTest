@@ -1,35 +1,39 @@
 package user.get.username;
 
-import data_providers.DataProvider;
 import io.restassured.response.Response;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import petstore.swagger.requests.Requests;
-import user.BaseTests;
+import petstore.validator.JsonValidator;
+import user.UserBaseTests;
 
-import static org.apache.http.HttpStatus.SC_NOT_FOUND;
-import static petstore.swagger.instances.endpoints.PetEndpoints.PET;
-import static petstore.swagger.instances.endpoints.PetEndpoints.PET_STRICT;
+import static org.apache.http.HttpStatus.*;
+import static petstore.swagger.instances.endpoints.UserEndpoint.USER;
+import static petstore.swagger.instances.endpoints.UserEndpoint.USER_STRICT;
+import static petstore.validator.ValidationTemplatePaths.PATH_TO_USER_TEMPLATE;
 
-public class NegativeGetIdTest extends BaseTests {
+public class NegativeGetIdTest extends UserBaseTests {
 
     @BeforeClass
     public void beforeGetByIdTests() {
-        Requests.post(PET, pet);
-        Requests.delete( PET_STRICT + pet.getId());
+        Requests.post(USER, user);
+        Requests.delete( USER_STRICT + user.getUsername());
     }
 
     @Test
-    public static void getPetByNotExistingIdNegative() {
-        Response response = Requests.get(PET_STRICT + pet.getId());
-        Assert.assertEquals(response.getStatusCode(), SC_NOT_FOUND, "Not existing pet exists");
+    public static void getByUsernameNegativeNonexistentUsername() {
+        Response response = Requests.get(USER_STRICT + "AAA");
+        Assert.assertEquals(response.getStatusCode(), SC_NOT_FOUND, "Username with this name exists");
+        JsonValidator.validateObject(response, PATH_TO_USER_TEMPLATE);
     }
 
-    @Test(dataProvider = "Incorrect_id", dataProviderClass = DataProvider.class)
-    public static void getPetByIncorrectIdNegative(String id) {
-        Response response = Requests.get(PET_STRICT + id);
-        Assert.assertEquals(response.getStatusCode(), SC_NOT_FOUND, "Incompatible type of id works out");
+    @Test
+    public static void getByUsernameNegativeDeletedUsername() {
+        Requests.delete( USER_STRICT + user.getUsername());
+        Response response = Requests.get(USER_STRICT + user.getUsername());
+        Assert.assertEquals(response.getStatusCode(), SC_NOT_FOUND, "Username with this name exists");
+        JsonValidator.validateObject(response, PATH_TO_USER_TEMPLATE);
     }
 
 }

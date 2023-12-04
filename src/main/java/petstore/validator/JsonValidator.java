@@ -15,7 +15,7 @@ import static petstore.validator.ValidationTemplatePaths.*;
 
 public class JsonValidator {
 
-    public static void validateObject(Response response,String path) {
+    public static void validateObject(Response response, String path) {
         try {
             String requestResponse = response.asString();
             JSONObject jsonSchema = new JSONObject(new JSONTokener(new FileInputStream(path)));
@@ -27,9 +27,9 @@ public class JsonValidator {
         }
     }
 
-    public static void validateList(String response) {
+    public static void validateList(String response, String path) {
         try {
-            JSONObject jsonSchema = new JSONObject(new JSONTokener(new FileInputStream(PATH_TO_PETLIST_TEMPLATE)));
+            JSONObject jsonSchema = new JSONObject(new JSONTokener(new FileInputStream(path)));
             JSONArray jsonSubject = new JSONArray(new JSONTokener(response));
             Schema schema = SchemaLoader.load(jsonSchema);
             schema.validate(jsonSubject);
